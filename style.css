@@ -1,0 +1,408 @@
+:root {
+  --ink: #1a2332;
+  --paper: #eef0ec;
+  --paper-2: #e2e5df;
+  --gold: #c9a648;
+  --land: #4a5d3a;
+  --air: #2f6690;
+  --sea: #26415c;
+  --medic: #7a2e3d;
+  --good: #3f7d4f;
+  --bad: #a4433a;
+  --radius: 10px;
+  font-size: 17px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.topbar {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 18px 20px 16px;
+  padding-top: max(18px, env(safe-area-inset-top));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  color: var(--gold);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.brand-sub {
+  font-size: 13px;
+  color: #b7c0cf;
+  margin-top: 2px;
+}
+
+.tabs {
+  display: flex;
+  background: var(--paper-2);
+  border-bottom: 1px solid #d3d7cd;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 13px 8px;
+  font-size: 15px;
+  color: #5c6270;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--gold);
+}
+
+main {
+  flex: 1;
+  padding: 18px 16px 32px;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.progress {
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+  margin: 4px 0 14px;
+  min-height: 16px;
+}
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  height: 25rem;
+}
+
+/* ---- Flashcard ---- */
+.card {
+  width: 100%;
+  height: 100%;
+  max-width: 420px;
+  min-height: 220px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  position: relative;
+  color: #fff;
+  display: grid;
+}
+
+.card-face {
+  grid-area: 1 / 1;
+  border-radius: var(--radius);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+  backface-visibility: hidden;
+  transition: opacity 0.15s ease;
+}
+
+.card-front { opacity: 1; }
+.card-back { opacity: 0; }
+.card.flipped .card-front { opacity: 0; }
+.card.flipped .card-back { opacity: 1; }
+
+.comp-landmacht .card-face { background: linear-gradient(160deg, var(--land), #34432a); }
+.comp-luchtmacht .card-face { background: linear-gradient(160deg, var(--air), #204a65); }
+.comp-marine .card-face { background: linear-gradient(160deg, var(--sea), #182c3d); }
+.comp-medisch .card-face { background: linear-gradient(160deg, var(--medic), #4a1f28); }
+
+.card-label {
+  font-size: 1.3rem;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.75);
+}
+
+.card-main {
+  font-family: Georgia, "Iowan Old Style", serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+/* ---- Rang-afbeeldingen ---- */
+.rank-img-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+}
+
+.rank-img {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+}
+
+.rank-img.small {
+  max-height: 80px;
+}
+
+.rank-img.tiny {
+  max-height: 40px;
+}
+
+.rank-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px;
+  opacity: 0.75;
+}
+
+.rank-img-placeholder .ph-icon { font-size: 28px; }
+.rank-img-placeholder small { font-size: 11px; max-width: 160px; text-align: center; }
+.rank-img-placeholder.small .ph-icon { font-size: 20px; }
+
+.flash-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.flash-actions.hidden { visibility: hidden; }
+
+.btn {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn.no { background: #e3d4d1; color: var(--bad); }
+.btn.yes { background: #d6e6d9; color: var(--good); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.ghost { background: transparent; border: 1px solid #b9bfb2; color: var(--ink); width: 100%; margin-bottom: 16px; }
+.btn.small { font-size: 13px; padding: 9px 12px; background: var(--paper-2); color: var(--ink); border: 1px dashed #b9bfb2; width: 100%; }
+
+.deck-done {
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.score-big {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.empty { text-align: center; color: #6b7280; padding: 30px 10px; }
+
+/* ---- Quiz ---- */
+.quiz-mode-toggle {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.quiz-question {
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.quiz-question.comp-landmacht { background: linear-gradient(160deg, var(--land), #34432a); }
+.quiz-question.comp-luchtmacht { background: linear-gradient(160deg, var(--air), #204a65); }
+.quiz-question.comp-marine { background: linear-gradient(160deg, var(--sea), #182c3d); }
+.quiz-question.comp-medisch { background: linear-gradient(160deg, var(--medic), #4a1f28); }
+
+.options {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  border: 1px solid #cfd3c8;
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option-btn.correct { background: #d6e6d9; border-color: var(--good); }
+.option-btn.wrong { background: #f0dcd9; border-color: var(--bad); }
+.option-btn:disabled { opacity: 0.9; }
+
+.option-with-img {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.option-thumb-wrap {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feedback {
+  min-height: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.feedback.ok { color: var(--good); }
+.feedback.bad { color: var(--bad); }
+
+/* ---- Beheer ---- */
+.beheer-intro {
+  font-size: 14px;
+  color: #4b5158;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.beheer-section { margin-bottom: 22px; }
+.beheer-section h3 {
+  font-family: Georgia, serif;
+  font-size: 17px;
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.beheer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.beheer-level {
+  font-size: 12px;
+  color: #8a8f85;
+  width: 20px;
+  text-align: right;
+}
+
+.beheer-row input {
+  flex: 1;
+  padding: 9px 10px;
+  border: 1px solid #cfd3c8;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.beheer-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.beheer-image-input {
+  font-size: 12px;
+  color: #5c6270;
+  font-family: ui-monospace, monospace;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: #a4433a;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.beheer-add { margin-top: 4px; }
+
+.images-section {
+  background: #fff;
+  border: 1px solid #d9dcd3;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.images-section .beheer-intro { margin-bottom: 12px; }
+.images-section .btn.ghost { width: auto; display: inline-block; margin-right: 8px; margin-bottom: 10px; }
+.images-section .btn.small { width: auto; display: inline-block; margin-bottom: 10px; }
+
+.checklist-box {
+  width: 100%;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  padding: 10px;
+  border: 1px solid #cfd3c8;
+  border-radius: 6px;
+  background: #f7f8f5;
+  resize: vertical;
+}

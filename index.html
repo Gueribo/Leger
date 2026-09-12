@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rangorde — Landmacht · Luchtmacht · Marine · Medische Dienst</title>
+<meta name="theme-color" content="#1a2332" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">★</span>
+    <div class="brand-text">
+      <span class="brand-title">Rangorde</span>
+      <span class="brand-sub">Landmacht · Luchtmacht · Marine · Medische Dienst</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-panel="panel-flash">Flashcards</button>
+  <button class="tab" data-panel="panel-quiz">Test</button>
+</nav>
+
+<main>
+  <section id="panel-flash" class="panel active">
+    <p class="progress" id="flash-progress"></p>
+    <div id="flash-wrap" class="stage"></div>
+  </section>
+
+  <section id="panel-quiz" class="panel">
+    <div class="quiz-mode-toggle">
+      <label><input type="radio" name="quiz-mode" value="component" checked /> Welke macht?</label>
+      <label><input type="radio" name="quiz-mode" value="compare" /> Wat is hoger?</label>
+      <label><input type="radio" name="quiz-mode" value="recognize" /> Herken de rang</label>
+    </div>
+    <p class="progress" id="quiz-progress"></p>
+    <div id="quiz-wrap" class="stage"></div>
+  </section>
+</main>
+
+<script src="./app.js"></script>
+</body>
+</html>

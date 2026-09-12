@@ -143,13 +143,12 @@ function byComponent(comp) {
 }
 
 // ============ AFBEELDINGEN (rang-insignes) ============
-// Voorkeursbron: Wikimedia Commons, via de bestandsnaam die je zelf overneemt
-// van de Wikipedia-pagina (bv. "LandOF9.png" uit een link als
-// https://upload.wikimedia.org/wikipedia/commons/4/4a/LandOF9.png).
-// We gebruiken Special:FilePath zodat we de exacte upload-map (de "4/4a"-hash)
-// niet zelf hoeven te kennen — Commons zoekt het bestand zelf op.
-// Is er geen Commons-bestandsnaam ingevuld, dan valt de app terug op een lokaal
-// bestand in images/ (zelfde als voorheen), en anders op een tekst-placeholder.
+// Voor een volledig offline-werkende app is de LOKALE map "images/" de
+// primaire bron: zet daar de bestanden in met exact dezelfde naam als het
+// "image"-veld hierboven (bv. images/LandOF9.png). Ontbreekt een bestand
+// lokaal, dan probeert de app het (enkel met internetverbinding) nog even
+// op te halen via Wikimedia Commons als noodgreep, en anders verschijnt een
+// nette placeholder met de rangnaam.
 const IMG_EXTS = ["png", "webp", "jpg", "jpeg", "svg"];
 
 function slugify(str) {
@@ -170,31 +169,27 @@ function commonsUrl(filename) {
 }
 
 function rankImgTag(item, extraClass = "") {
-  const base = imageBaseName(item);
-  const hasCommons = !!(item.image && item.image.trim());
-  const initialSrc = hasCommons ? commonsUrl(item.image.trim()) : `./images/${base}.${IMG_EXTS[0]}`;
-  const stage = hasCommons ? "commons" : "local";
-  return `<img src="${initialSrc}" data-base="${base}" data-ext-idx="0" data-stage="${stage}" alt="${item.rank}" class="rank-img ${extraClass}" onerror="handleImgError(this)" />`;
+  const hasImage = !!(item.image && item.image.trim());
+  const filename = hasImage ? item.image.trim() : `${imageBaseName(item)}.png`;
+  // Lokaal bestand is de PRIMAIRE bron (voor een echte offline app) — zelfde
+  // bestandsnaam als op Commons, gewoon opgeslagen in de map "images/".
+  const initialSrc = `./images/${filename}`;
+  return `<img src="${initialSrc}" data-filename="${filename}" data-stage="local" alt="${item.rank}" class="rank-img ${extraClass}" onerror="handleImgError(this)" />`;
 }
 
 function handleImgError(img) {
-  if (img.dataset.stage === "commons") {
-    // Commons-bestand niet gevonden (of geen naam ingevuld) -> probeer lokaal bestand
-    img.dataset.stage = "local";
-    img.dataset.extIdx = "0";
-    img.src = `./images/${img.dataset.base}.${IMG_EXTS[0]}`;
+  if (img.dataset.stage === "local") {
+    // Lokaal bestand ontbreekt -> probeer als online-fallback Wikimedia Commons
+    // (werkt alleen met internetverbinding; voor offline gebruik moet het
+    // bestand echt in images/ staan).
+    img.dataset.stage = "commons";
+    img.src = commonsUrl(img.dataset.filename);
     return;
   }
-  const idx = parseInt(img.dataset.extIdx, 10) + 1;
-  if (idx < IMG_EXTS.length) {
-    img.dataset.extIdx = String(idx);
-    img.src = `./images/${img.dataset.base}.${IMG_EXTS[idx]}`;
-  } else {
-    const div = document.createElement("div");
-    div.className = "rank-img-placeholder " + (img.className.includes("small") ? "small" : "");
-    div.innerHTML = `<span class="ph-icon">🎖️</span><small>${img.alt}</small>`;
-    img.replaceWith(div);
-  }
+  const div = document.createElement("div");
+  div.className = "rank-img-placeholder " + (img.className.includes("small") ? "small" : "");
+  div.innerHTML = `<span class="ph-icon">🎖️</span><small>${img.alt}</small>`;
+  img.replaceWith(div);
 }
 window.handleImgError = handleImgError;
 
@@ -251,6 +246,7 @@ function renderFlashcard() {
       <div class="card-face card-back">
         <span class="card-label">${COMPONENT_LABELS[item.component]}</span>
         <span class="card-main">${item.rank}</span>
+        <span class="card-hint">Niveau ${item.level} van ${byComponent(item.component).length}</span>
       </div>
     </div>
     <div class="flash-actions ${flashFlipped ? "" : "hidden"}">
@@ -476,3 +472,48 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   });
 }
+
+// ============ INSTALLATIE (eigen knop i.p.v. adresbalk-icoon) ============
+// De browser bepaalt zelf of/waar hij een install-icoon toont (enkel
+// Chrome/Edge doen dat, en niet consistent) — dit is niet aan te passen.
+// In plaats daarvan vangen we hetzelfde event op en tonen we een eigen knop,
+// die op elk ondersteunend platform werkt.
+let deferredInstallPrompt = null;
+const installBtn = document.getElementById("install-btn");
+const iosHint = document.getElementById("ios-install-hint");
+
+function isStandaloneAlready() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.navigator.standalone === true
+  );
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  if (!isStandaloneAlready()) installBtn.classList.remove("hidden");
+});
+
+installBtn.addEventListener("click", async () => {
+  if (!deferredInstallPrompt) return;
+  installBtn.classList.add("hidden");
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+});
+
+window.addEventListener("appinstalled", () => {
+  installBtn.classList.add("hidden");
+});
+
+// iOS Safari heeft geen beforeinstallprompt-event; toon in plaats daarvan een
+// korte, statische instructie voor "Zet op beginscherm".
+(function maybeShowIosHint() {
+  const ua = window.navigator.userAgent;
+  const isIos = /iPad|iPhone|iPod/.test(ua);
+  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  if (isIos && isSafari && !isStandaloneAlready()) {
+    iosHint.classList.remove("hidden");
+  }
+})();

@@ -142,6 +142,17 @@ function byComponent(comp) {
   return ranks.filter((r) => r.component === comp);
 }
 
+function levelCategory(level) {
+  if (level <= 3) return "Vrijwilligers";
+  if (level <= 5) return "Keurvrijwilligers";
+  if (level <= 8) return "Lagere Onderofficieren";
+  if (level <= 10) return "Keuronderofficieren";
+  if (level <= 12) return "Hoofdonderofficieren";
+  if (level <= 16) return "Lagere Officieren";
+  if (level <= 19) return "Hoofdofficieren";
+  return "Opperofficieren";
+}
+
 // ============ AFBEELDINGEN (rang-insignes) ============
 // Voor een volledig offline-werkende app is de LOKALE map "images/" de
 // primaire bron: zet daar de bestanden in met exact dezelfde naam als het
@@ -239,19 +250,17 @@ function renderFlashcard() {
   wrap.innerHTML = `
     <div class="card comp-${item.component} ${flashFlipped ? "flipped" : ""}" id="flash-card">
       <div class="card-face card-front">
-        <span class="card-label">Welke rang is dit?</span>
         <div class="rank-img-wrap">${rankImgTag(item)}</div>
-        <span class="card-hint">Tik om het antwoord te zien</span>
       </div>
       <div class="card-face card-back">
         <span class="card-label">${COMPONENT_LABELS[item.component]}</span>
         <span class="card-main">${item.rank}</span>
-        <span class="card-hint">Niveau ${item.level} van ${byComponent(item.component).length}</span>
+        <span class="card-hint">${levelCategory(item.level)}</span>
       </div>
     </div>
     <div class="flash-actions ${flashFlipped ? "" : "hidden"}">
-      <button class="btn no" id="btn-unknown">Wist ik niet</button>
-      <button class="btn yes" id="btn-known">Wist ik</button>
+      <button class="btn no" id="btn-unknown">X</button>
+      <button class="btn yes" id="btn-known">✔</button>
     </div>
   `;
   document.getElementById("flash-card").addEventListener("click", () => {

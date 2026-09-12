@@ -186,16 +186,19 @@ main {
 .comp-medisch .card-face { background: linear-gradient(160deg, var(--medic), #4a1f28); }
 
 .card-label {
-  font-size: 13px;
+  font-size: 1.3rem;
   letter-spacing: 0.04em;
   color: rgba(255,255,255,0.75);
 }
 
 .card-main {
   font-family: Georgia, "Iowan Old Style", serif;
-  font-size: 25px;
+  font-size: clamp(1rem, 4vw, 2rem);
   font-weight: 700;
   line-height: 1.25;
+  max-width: 100%;
+  white-space: pre-wrap;
+  display: inline-block;
 }
 
 .card-hint {
@@ -212,7 +215,7 @@ main {
 }
 
 .rank-img {
-  max-height: 170px;
+  max-height: 18rem;
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
@@ -322,6 +325,8 @@ main {
   font-size: 15px;
   text-align: left;
   cursor: pointer;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .option-btn.correct { background: #d6e6d9; border-color: var(--good); }
@@ -332,6 +337,13 @@ main {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.option-with-img span {
+  min-width: 0;
+  white-space: nowrap;
+  flex: 1;
+  display: inline-block;
 }
 
 .option-thumb-wrap {

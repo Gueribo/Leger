@@ -1,4 +1,4 @@
-const CACHE_NAME = "rangorde-v7";
+const CACHE_NAME = "rangorde-v8";
 const CORE_ASSETS = [
   "./",
   "./index.html",

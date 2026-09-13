@@ -154,13 +154,10 @@ function levelCategory(level) {
 }
 
 // ============ AFBEELDINGEN (rang-insignes) ============
-// Voor een volledig offline-werkende app is de LOKALE map "images/" de
-// primaire bron: zet daar de bestanden in met exact dezelfde naam als het
-// "image"-veld hierboven (bv. images/LandOF9.png). Ontbreekt een bestand
-// lokaal, dan probeert de app het (enkel met internetverbinding) nog even
-// op te halen via Wikimedia Commons als noodgreep, en anders verschijnt een
-// nette placeholder met de rangnaam.
-const IMG_EXTS = ["png", "webp", "jpg", "jpeg", "svg"];
+// Volledig lokaal, geen internetverbinding nodig: elke afbeelding komt uit de
+// map "images/" naast index.html, met exact dezelfde bestandsnaam als het
+// "image"-veld hierboven (bv. images/LandOF9.png). Ontbreekt een bestand,
+// dan verschijnt meteen een nette placeholder met de rangnaam.
 
 function slugify(str) {
   return str
@@ -175,28 +172,17 @@ function imageBaseName(item) {
   return `${item.component}__${slugify(item.rank)}`;
 }
 
-function commonsUrl(filename) {
-  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}`;
-}
-
 function rankImgTag(item, extraClass = "") {
   const hasImage = !!(item.image && item.image.trim());
   const filename = hasImage ? item.image.trim() : `${imageBaseName(item)}.png`;
-  // Lokaal bestand is de PRIMAIRE bron (voor een echte offline app) — zelfde
-  // bestandsnaam als op Commons, gewoon opgeslagen in de map "images/".
-  const initialSrc = `./images/${filename}`;
-  return `<img src="${initialSrc}" data-filename="${filename}" data-stage="local" alt="${item.rank}" class="rank-img ${extraClass}" onerror="handleImgError(this)" />`;
+  // Uitsluitend lokaal: de afbeelding komt altijd uit de map "images/" naast
+  // index.html. Geen enkele online fallback — ontbreekt het bestand, dan
+  // verschijnt meteen de tekst-placeholder.
+  const src = `./images/${filename}`;
+  return `<img src="${src}" alt="${item.rank}" class="rank-img ${extraClass}" onerror="handleImgError(this)" />`;
 }
 
 function handleImgError(img) {
-  if (img.dataset.stage === "local") {
-    // Lokaal bestand ontbreekt -> probeer als online-fallback Wikimedia Commons
-    // (werkt alleen met internetverbinding; voor offline gebruik moet het
-    // bestand echt in images/ staan).
-    img.dataset.stage = "commons";
-    img.src = commonsUrl(img.dataset.filename);
-    return;
-  }
   const div = document.createElement("div");
   div.className = "rank-img-placeholder " + (img.className.includes("small") ? "small" : "");
   div.innerHTML = `<span class="ph-icon">🎖️</span><small>${img.alt}</small>`;
@@ -250,7 +236,9 @@ function renderFlashcard() {
   wrap.innerHTML = `
     <div class="card comp-${item.component} ${flashFlipped ? "flipped" : ""}" id="flash-card">
       <div class="card-face card-front">
+        <span class="card-label">Welke rang is dit?</span>
         <div class="rank-img-wrap">${rankImgTag(item)}</div>
+        <span class="card-hint">Tik om het antwoord te zien</span>
       </div>
       <div class="card-face card-back">
         <span class="card-label">${COMPONENT_LABELS[item.component]}</span>
@@ -259,8 +247,8 @@ function renderFlashcard() {
       </div>
     </div>
     <div class="flash-actions ${flashFlipped ? "" : "hidden"}">
-      <button class="btn no" id="btn-unknown">X</button>
-      <button class="btn yes" id="btn-known">✔</button>
+      <button class="btn no" id="btn-unknown">Wist ik niet</button>
+      <button class="btn yes" id="btn-known">Wist ik</button>
     </div>
   `;
   document.getElementById("flash-card").addEventListener("click", () => {
